@@ -34,7 +34,7 @@ const routes = [
 	{
 		path: "/:pathMatch(.*)*",
 		name: "error404",
-		component: "ErrorPage",
+		component: () => require("../components/ErrorPage.vue"),
 	},
 ];
 
