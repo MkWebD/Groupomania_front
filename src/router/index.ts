@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from "vue-router";
+import { createRouter, createWebHashHistory } from "vue-router";
 
 const routes = [
 	{
@@ -39,14 +39,15 @@ const routes = [
 ];
 
 const router = createRouter({
-	history: createWebHistory(),
+	history: createWebHashHistory(),
 	routes,
 });
 
 router.beforeEach((to) => {
 	if (!localStorage.user && to.name !== "logIn" && to.name !== "signUp") {
-		return { name: "logIn" };
+		return { name: "logIn", query: { nextUrl: to.fullPath } };
 	}
+	return true;
 });
 
 export default router;
