@@ -31,11 +31,6 @@ const routes = [
 		name: "logIn",
 		component: () => require("../views/auth/LogInView.vue"),
 	},
-	{
-		path: "/:pathMatch(.*)*",
-		name: "error404",
-		component: () => require("../components/ErrorPage.vue"),
-	},
 ];
 
 const router = createRouter({
