@@ -1,35 +1,41 @@
 import { createRouter, createWebHistory } from "vue-router";
+import LogIn from "../views/auth/LogInView.vue";
+import SignUp from "../views/auth/SignUpView.vue";
+import AllPosts from "../views/posts/AllPosts.vue";
+import CreatePost from "../views/posts/CreatePost.vue";
+import SinglePost from "../views/posts/SinglePost.vue";
+import UpdatePost from "../views/posts/UpdatePost.vue";
 
 const routes = [
 	{
 		path: "/",
 		name: "home",
-		component: () => require("../views/posts/AllPosts.vue"),
+		component: AllPosts,
 	},
 	{
 		path: "/:id",
 		name: "post",
-		component: () => require("../views/posts/SinglePost.vue"),
+		component: SinglePost,
 	},
 	{
 		path: "/newPost",
 		name: "postCreation",
-		component: () => require("../views/posts/CreatePost.vue"),
+		component: CreatePost,
 	},
 	{
 		path: "/:id",
 		name: "postUpdate",
-		component: () => require("../views/posts/UpdatePost.vue"),
+		component: UpdatePost,
 	},
 	{
 		path: "/auth/sign_up",
 		name: "signUp",
-		component: () => require("../views/auth/SignUpView.vue"),
+		component: SignUp,
 	},
 	{
 		path: "/auth/log_in",
 		name: "logIn",
-		component: () => require("../views/auth/LogInView.vue"),
+		component: LogIn,
 	},
 ];
 
