@@ -2,7 +2,7 @@ const { defineConfig } = require("@vue/cli-service");
 module.exports = defineConfig({
 	transpileDependencies: true,
 	devServer: {
-		proxy: "https://Groupomaniaback.kevinmas.repl.co/",
+		proxy: "https://server.kevinmas.com/groupomania/",
 	},
 	pluginOptions: {
 		vuetify: {
