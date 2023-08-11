@@ -102,7 +102,7 @@
     const { handleSubmit, resetForm } = useForm();
     const router = useRouter()
     const route = useRoute()
-    const serverUrl = "http://localhost:8080/api/post/"
+    const serverUrl = "https://server.kevinmas.com/groupomania/api/post/"
     const id = route.params.id
     const parsedStorage = JSON.parse(localStorage.user)
     const url = ref(null)
@@ -170,4 +170,3 @@
         yup.mixed()
     )
 </script>
-
