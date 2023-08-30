@@ -1,0 +1,109 @@
+@import "../../assets/styles/variables";
+@import "../../assets/styles/mixins";
+
+.main-bg {
+    background: linear-gradient(to bottom, $primary-color, darken($primary-color, 10%), darken($primary-color, 20%));
+}
+
+.test {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100;
+    min-height: 93vh;
+    font-family: "Jost", sans-serif;
+}
+.main {
+    width: 350px;
+    height: 600px;
+    background: linear-gradient(to bottom, $tertiary-color, lighten($tertiary-color, 35%));
+    overflow: hidden;
+    @include border-radius($border-radius);
+    box-shadow: 5px 20px 50px #000;
+}
+#chk {
+    display: none;
+}
+.signup {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+label {
+    color: #fff;
+    font-size: 2.3em;
+    justify-content: center;
+    display: flex;
+    margin: 60px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.5s ease-in-out;
+}
+.auth__input {
+    width: 60%;
+    height: 20px;
+    background: #e0dede;
+    justify-content: center;
+    display: flex;
+    margin: 20px auto;
+    padding: 20px;
+    border: none;
+    outline: none;
+    border-radius: 5px;
+
+    &.is-invalid {
+        border: 1px solid red;
+    }
+}
+
+.login__button {
+    width: 60%;
+    height: 40px;
+    margin: 10px auto;
+    justify-content: center;
+    display: block;
+    color: #fff;
+    background: #573b8a;
+    font-size: 1em;
+    font-weight: bold;
+    margin-top: 20px;
+    outline: none;
+    border: none;
+    border-radius: 5px;
+    transition: 0.2s ease-in;
+    cursor: pointer;
+}
+.login__button:hover {
+    background: #6d44b8;
+}
+.login {
+    height: 560px;
+    background: #eee;
+    border-radius: 60% / 10%;
+    transform: translateY(-180px);
+    transition: 0.8s ease-in-out;
+}
+.login label {
+    color: #573b8a;
+    transform: scale(0.6);
+}
+
+#chk:checked ~ .login {
+    transform: translateY(-600px);
+}
+#chk:checked ~ .login label {
+    transform: scale(1);
+}
+#chk:checked ~ .signup label {
+    transform: scale(0.6);
+}
+
+.password__errors {
+    font-size: 0.8rem;
+    width: 60%;
+    margin: 0 auto;
+}
+
+.is-valid {
+    color: limegreen;
+}
