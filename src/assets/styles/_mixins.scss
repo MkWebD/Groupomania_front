@@ -9,3 +9,13 @@
     -moz-border-radius: $radius;
     border-radius: $radius;
 }
+
+@mixin flex-center($alignment: center, $justification: center, $direction: null) {
+    display: flex;
+    align-items: $alignment;
+    justify-content: $justification;
+
+    @if $direction != null {
+        flex-direction: $direction;
+    }
+}

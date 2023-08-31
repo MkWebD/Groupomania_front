@@ -1,46 +1,39 @@
 <template>
-    <v-app-bar class="bg-tertiary">
-        <nav class="text-secondary d-flex w-100 justify-space-between">
-            <div>
-                <router-link v-if="loginStatus" to="/">Home</router-link>
-                <span v-if="!loginStatus"><router-link to="/auth/sign_up">Sign-up</router-link> | </span>
-                <span v-if="!loginStatus"><router-link to="/auth/log_in">Log-in</router-link></span>
-            </div>
-            <div>
-                <router-link v-if="loginStatus" @click="logout" to="/auth/log_in">Log-out</router-link>
-            </div>
-        </nav>
-    </v-app-bar>
+	<v-app-bar class="navBar">
+		<nav class="nav">
+			<div class="nav__subMenu">
+				<router-link v-if="loginStatus" :to="homeLink" class="nav__subMenu--button">Home</router-link>
+				<router-link v-if="loginStatus" @click="logout" class="nav__subMenu--button" :to="authLink"
+					>Log-out</router-link
+				>
+			</div>
+			<div class="nav__subMenu">
+				<router-link v-if="!loginStatus" class="nav__subMenu--button" :to="authLink">Authentication</router-link>
+			</div>
+		</nav>
+	</v-app-bar>
 </template>
 
 <script setup lang="ts">
-    // Importing required external resources
-    import {computed} from 'vue'
-    import {useStore} from 'vuex'
+// Importing required external resources
+import { computed } from "vue";
+import { useStore } from "vuex";
+import "./NavBar.scss";
 
-    // Creating environment variables
-    const store = useStore()
+// Creating environment variables
+const store = useStore();
 
-    // Creating function for logout
-    const logout = () => {
-        store.dispatch('logout')
-        window.localStorage.removeItem('user')
-    }
+const homeLink = "/";
+const authLink = "/auth";
 
-    // Getting info from store on logged status
-    const loginStatus = computed(() => store.getters.loginStatus)
+// Creating function for logout
+const logout = () => {
+	store.dispatch("logout");
+	window.localStorage.removeItem("user");
+};
+
+// Getting info from store on logged status
+const loginStatus = computed(() => store.getters.loginStatus);
 </script>
 
-<style>
-    a {
-        text-decoration: none;
-    }
-
-    a:visited {
-        color: inherit;
-    }
-
-    a:hover {
-        color: white;
-    }
-</style>
+<style></style>

@@ -1,13 +1,13 @@
 <template>
 	<div class="fill-height main-bg">
-		<v-container class="test">
-			<div class="main">
-				<input type="checkbox" id="chk" aria-hidden="true" />
+		<v-container class="main">
+			<div class="main__content">
+				<input type="checkbox" class="main__content--checkbox" id="check" aria-hidden="true" />
 
 				<div class="signup">
 					<VeeForm v-slot="{ handleSubmit }" :validation-schema="signUpSchema" as="div">
 						<form @submit="handleSubmit($event, onSignUp)">
-							<label for="chk" aria-hidden="true">Sign up</label>
+							<label class="signup__label" for="check" aria-hidden="true">Sign up</label>
 							<Field
 								class="auth__input"
 								:class="{ 'is-invalid': signUpEmailError }"
@@ -17,7 +17,7 @@
 								placeholder="Email"
 							/>
 							<div>
-								<p class="password__error" :class="{ 'is-invalid': signUpUserError }" v-if="signUpUserError">
+								<p class="email__error" :class="{ 'is-invalid': signUpUserError }" v-if="signUpUserError">
 									{{ signUpUserError }}
 								</p>
 							</div>
@@ -29,20 +29,20 @@
 								name="signUpPassword"
 								placeholder="Password"
 							/>
-							<div class="password__errors">
-								<p class="password__error" :class="{ 'is-valid': signUpPassword?.match(/^.{8,12}$/) }">
+							<div class="password__error">
+								<p class="password__hint" :class="{ 'is-valid': signUpPassword?.match(/^.{8,12}$/) }">
 									{{ passWordErrorsMessages.length }}
 								</p>
-								<p class="password__error" :class="{ 'is-valid': signUpPassword?.match(/^(?=.*[A-Z])/) }">
+								<p class="password__hint" :class="{ 'is-valid': signUpPassword?.match(/^(?=.*[A-Z])/) }">
 									{{ passWordErrorsMessages.uppercase }}
 								</p>
-								<p class="password__error" :class="{ 'is-valid': signUpPassword?.match(/^(?=.*[a-z])/) }">
+								<p class="password__hint" :class="{ 'is-valid': signUpPassword?.match(/^(?=.*[a-z])/) }">
 									{{ passWordErrorsMessages.lowercase }}
 								</p>
-								<p class="password__error" :class="{ 'is-valid': signUpPassword?.match(/\d/) }">
+								<p class="password__hint" :class="{ 'is-valid': signUpPassword?.match(/\d/) }">
 									{{ passWordErrorsMessages.number }}
 								</p>
-								<p class="password__error" :class="{ 'is-valid': signUpPassword?.match(/[@$!%*#?&]/) }">
+								<p class="password__hint" :class="{ 'is-valid': signUpPassword?.match(/[@$!%*#?&]/) }">
 									{{ passWordErrorsMessages.specialCharacter }}
 								</p>
 							</div>
@@ -54,7 +54,7 @@
 				<div class="login">
 					<VeeForm v-slot="{ handleSubmit }" :validation-schema="logInSchema" as="div">
 						<form @submit="handleSubmit($event, onlogIn)">
-							<label for="chk" aria-hidden="true">Log in</label>
+							<label class="login__label" for="check" aria-hidden="true">Log in</label>
 							<Field
 								class="auth__input"
 								:class="{ 'is-invalid': logInEmailError }"
@@ -76,20 +76,20 @@
 								name="logInPassword"
 								placeholder="Password"
 							/>
-							<div class="password__errors">
-								<p class="password__error" :class="{ 'is-valid': logInPassword?.match(/^.{8,12}$/) }">
+							<div class="password__error">
+								<p class="password__hint" :class="{ 'is-valid': logInPassword?.match(/^.{8,12}$/) }">
 									{{ passWordErrorsMessages.length }}
 								</p>
-								<p class="password__error" :class="{ 'is-valid': logInPassword?.match(/^(?=.*[A-Z])/) }">
+								<p class="password__hint" :class="{ 'is-valid': logInPassword?.match(/^(?=.*[A-Z])/) }">
 									{{ passWordErrorsMessages.uppercase }}
 								</p>
-								<p class="password__error" :class="{ 'is-valid': logInPassword?.match(/^(?=.*[a-z])/) }">
+								<p class="password__hint" :class="{ 'is-valid': logInPassword?.match(/^(?=.*[a-z])/) }">
 									{{ passWordErrorsMessages.lowercase }}
 								</p>
-								<p class="password__error" :class="{ 'is-valid': logInPassword?.match(/\d/) }">
+								<p class="password__hint" :class="{ 'is-valid': logInPassword?.match(/\d/) }">
 									{{ passWordErrorsMessages.number }}
 								</p>
-								<p class="password__error" :class="{ 'is-valid': logInPassword?.match(/[@$!%*#?&]/) }">
+								<p class="password__hint" :class="{ 'is-valid': logInPassword?.match(/[@$!%*#?&]/) }">
 									{{ passWordErrorsMessages.specialCharacter }}
 								</p>
 							</div>
@@ -110,7 +110,7 @@ import { useRouter } from "vue-router";
 import { useStore } from "vuex";
 import * as yup from "yup";
 import "../../assets/styles/authForm.scss";
-import "./LogInView.scss";
+import "./AuthenticationStyles.scss";
 
 // Creating router variables
 const router = useRouter();
@@ -184,20 +184,16 @@ const fetchData = (formData: unknown, authenticationType: "login" | "signup") =>
 
 function onSignUp(values: unknown) {
 	const formValues = values as { signUpEmail: string; signUpPassword: string };
-	const formData = new FormData();
-	formData.append("signUpEmail", formValues.signUpEmail);
-	formData.append("signUpPassword", formValues.signUpPassword);
+	const payload = { email: formValues.signUpEmail, password: formValues.signUpPassword };
 
-	fetchData(formValues, "signup");
+	fetchData(payload, "signup");
 }
 
 function onlogIn(values: unknown) {
 	const formValues = values as { logInEmail: string; logInPassword: string };
-	const formData = new FormData();
-	formData.append("logInEmail", formValues.logInEmail);
-	formData.append("logInPassword", formValues.logInPassword);
+	const payload = { email: formValues.logInEmail, password: formValues.logInPassword };
 
-	fetchData(formValues, "login");
+	fetchData(payload, "login");
 }
 
 const passWordErrorsMessages = {

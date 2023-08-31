@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
-import LogIn from "../views/auth/LogInView.vue";
-import SignUp from "../views/auth/SignUpView.vue";
+import Authentication from "../views/auth/AuthenticationView.vue";
 import AllPosts from "../views/posts/AllPosts.vue";
 import CreatePost from "../views/posts/CreatePost.vue";
 import SinglePost from "../views/posts/SinglePost.vue";
@@ -28,14 +27,9 @@ const routes = [
 		component: UpdatePost,
 	},
 	{
-		path: "/auth/sign_up",
-		name: "signUp",
-		component: SignUp,
-	},
-	{
-		path: "/auth/log_in",
-		name: "logIn",
-		component: LogIn,
+		path: "/auth",
+		name: "auth",
+		component: Authentication,
 	},
 ];
 
@@ -45,8 +39,8 @@ const router = createRouter({
 });
 
 router.beforeEach((to) => {
-	if (!localStorage.user && to.name !== "logIn" && to.name !== "signUp") {
-		return { name: "logIn", query: { nextUrl: to.fullPath } };
+	if (!localStorage.user && to.name !== "auth") {
+		return { name: "auth", query: { nextUrl: to.fullPath } };
 	}
 	return true;
 });
