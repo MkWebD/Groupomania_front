@@ -31,19 +31,19 @@
 							/>
 							<div class="password__error">
 								<p class="password__hint" :class="{ 'is-valid': signUpPassword?.match(/^.{8,12}$/) }">
-									{{ passWordErrorsMessages.length }}
+									{{ PassWordErrorsMessages.length }}
 								</p>
 								<p class="password__hint" :class="{ 'is-valid': signUpPassword?.match(/^(?=.*[A-Z])/) }">
-									{{ passWordErrorsMessages.uppercase }}
+									{{ PassWordErrorsMessages.uppercase }}
 								</p>
 								<p class="password__hint" :class="{ 'is-valid': signUpPassword?.match(/^(?=.*[a-z])/) }">
-									{{ passWordErrorsMessages.lowercase }}
+									{{ PassWordErrorsMessages.lowercase }}
 								</p>
 								<p class="password__hint" :class="{ 'is-valid': signUpPassword?.match(/\d/) }">
-									{{ passWordErrorsMessages.number }}
+									{{ PassWordErrorsMessages.number }}
 								</p>
 								<p class="password__hint" :class="{ 'is-valid': signUpPassword?.match(/[@$!%*#?&]/) }">
-									{{ passWordErrorsMessages.specialCharacter }}
+									{{ PassWordErrorsMessages.specialCharacter }}
 								</p>
 							</div>
 							<button class="login__button">Sign up</button>
@@ -78,19 +78,19 @@
 							/>
 							<div class="password__error">
 								<p class="password__hint" :class="{ 'is-valid': logInPassword?.match(/^.{8,12}$/) }">
-									{{ passWordErrorsMessages.length }}
+									{{ PassWordErrorsMessages.length }}
 								</p>
 								<p class="password__hint" :class="{ 'is-valid': logInPassword?.match(/^(?=.*[A-Z])/) }">
-									{{ passWordErrorsMessages.uppercase }}
+									{{ PassWordErrorsMessages.uppercase }}
 								</p>
 								<p class="password__hint" :class="{ 'is-valid': logInPassword?.match(/^(?=.*[a-z])/) }">
-									{{ passWordErrorsMessages.lowercase }}
+									{{ PassWordErrorsMessages.lowercase }}
 								</p>
 								<p class="password__hint" :class="{ 'is-valid': logInPassword?.match(/\d/) }">
-									{{ passWordErrorsMessages.number }}
+									{{ PassWordErrorsMessages.number }}
 								</p>
 								<p class="password__hint" :class="{ 'is-valid': logInPassword?.match(/[@$!%*#?&]/) }">
-									{{ passWordErrorsMessages.specialCharacter }}
+									{{ PassWordErrorsMessages.specialCharacter }}
 								</p>
 							</div>
 							<button class="login__button">Log in</button>
@@ -196,7 +196,7 @@ function onlogIn(values: unknown) {
 	fetchData(payload, "login");
 }
 
-const passWordErrorsMessages = {
+const PassWordErrorsMessages = {
 	length: "Must have 8 to 12 characters",
 	uppercase: "Must have one uppercase letter",
 	lowercase: "Must have one lowercase letter",

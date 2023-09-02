@@ -1,12 +1,9 @@
 <template>
 	<nav v-if="loginStatus" class="nav">
-		<div v-if="loginStatus" class="nav__subMenu">
+		<div class="nav__subMenu">
 			<router-link :to="homeLink" class="nav__subMenu--button">Home</router-link>
 			<router-link @click="logout" class="nav__subMenu--button" :to="authLink">Log-out</router-link>
 		</div>
-		<!-- <div v-if="!loginStatus" class="nav__subMenu nav__subMenu--single">
-			<router-link class="nav__subMenu--button" :to="authLink">Authentication</router-link>
-		</div> -->
 	</nav>
 </template>
 
