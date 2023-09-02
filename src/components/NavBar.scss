@@ -2,19 +2,20 @@
 @import "../assets//styles//mixins";
 
 .nav {
-    width: inherit;
-    transition: 0.5s;
+    height: 7vh;
+    @include linear-gradient($tertiary-color, lighten($tertiary-color, 20%));
+    @include flex-center;
 
     &__subMenu {
-        display: flex;
-        justify-content: space-between;
-
+        @include flex-center(center, space-between);
+        width: 100%;
+        padding: 0 1rem;
         &--button {
             padding: 1rem;
             position: relative;
             display: block;
             font-family: Lato, sans-serif;
-            color: $tertiary-color;
+            color: $primary-color;
             text-decoration: none;
             text-transform: uppercase;
             transition: 0.5s;
@@ -33,7 +34,7 @@
             }
 
             &:hover {
-                color: $primary-color;
+                color: $secondary-color;
 
                 &::after {
                     transform: scaleX(1);
@@ -44,17 +45,6 @@
     }
 
     .router-link-active {
-        color: darken($primary-color, 10%);
-    }
-}
-
-.v-app-bar.navBar {
-    height: 7vh;
-    @include linear-gradient($quaternary-color, lighten($quaternary-color, 20%));
-}
-
-@media screen and (min-width: 768px) {
-    .nav {
-        width: 50vw;
+        color: $secondary-color;
     }
 }

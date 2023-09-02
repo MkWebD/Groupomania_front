@@ -7,9 +7,8 @@
 					<v-btn class="posts__button">Add a new post</v-btn>
 				</router-link>
 			</v-row>
-			<v-row>
-				<PostCard />
-			</v-row>
+
+			<PostCard />
 		</v-container>
 	</div>
 </template>
