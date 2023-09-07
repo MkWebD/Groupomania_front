@@ -7,6 +7,7 @@
 </template>
 
 <script setup lang="ts">
+import "./ConfirmationPopup.scss";
 defineProps<{ message: string; onConfirm: () => void; onCancel: () => void }>();
 const emit = defineEmits(["confirm", "cancel"]);
 
