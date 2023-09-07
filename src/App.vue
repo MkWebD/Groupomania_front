@@ -1,8 +1,6 @@
 <template>
-	<main>
-		<NavBar />
-		<router-view />
-	</main>
+	<NavBar />
+	<router-view />
 </template>
 
 <script setup lang="ts">

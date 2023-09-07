@@ -1,19 +1,28 @@
 <template>
-	<div class="fill-height main-bg">
-		<v-container class="postsContainer">
-			<h1 class="text-center posts__header h1">Most recent posts</h1>
-			<v-row class="mt-5 mb-5 justify-center">
-				<router-link :to="{ name: 'postCreation' }">
-					<v-btn class="posts__button">Add a new post</v-btn>
-				</router-link>
-			</v-row>
-
-			<PostCard />
-		</v-container>
+	<div class="posts main-bg">
+		<div class="posts__container">
+			<div class="posts__header">
+				<h1 class="posts__header--title">Most recent posts</h1>
+				<div class="posts__header--menu">
+					<button class="posts__button" @click="toggleIsAddingPost">{{ buttonText }}</button>
+				</div>
+			</div>
+			<PostCard :isAddingPost="isAddingPost" />
+		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
+import { computed, ref } from "vue";
 import PostCard from "../../components/PostCard.vue";
 import "./AllPosts.scss";
+const isAddingPost = ref<boolean>(false);
+
+const toggleIsAddingPost = () => {
+	isAddingPost.value = !isAddingPost.value;
+};
+
+const buttonText = computed(() => {
+	return isAddingPost.value ? "Close add Form" : "Add a new post";
+});
 </script>

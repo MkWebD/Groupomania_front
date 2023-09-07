@@ -1,13 +1,9 @@
 @import "../../assets/styles/variables";
 @import "../../assets/styles/mixins";
 
-.main-bg {
-    background: linear-gradient(to bottom, $primary-color, darken($primary-color, 10%), darken($primary-color, 20%));
-}
-
 .main {
     @include flex-center;
-    min-height: 93vh;
+    min-height: 100vh;
 
     &__content {
         width: 350px;

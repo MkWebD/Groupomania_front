@@ -1,8 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Authentication from "../views/auth/AuthenticationView.vue";
 import AllPosts from "../views/posts/AllPosts.vue";
-import CreatePost from "../views/posts/CreatePost.vue";
-import SinglePost from "../views/posts/SinglePost.vue";
 import UpdatePost from "../views/posts/UpdatePost.vue";
 
 const routes = [
@@ -11,16 +9,7 @@ const routes = [
 		name: "home",
 		component: AllPosts,
 	},
-	{
-		path: "/:id",
-		name: "post",
-		component: SinglePost,
-	},
-	{
-		path: "/newPost",
-		name: "postCreation",
-		component: CreatePost,
-	},
+
 	{
 		path: "/:id",
 		name: "postUpdate",

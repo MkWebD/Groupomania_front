@@ -1,13 +1,6 @@
 @import "../assets/styles/variables";
 @import "../assets/styles/mixins";
 
-$main-green: #79dd09 !default;
-$main-green-rgb-015: rgba(121, 221, 9, 0.1) !default;
-$main-yellow: #bdbb49 !default;
-$main-yellow-rgb-015: rgba(189, 187, 73, 0.1) !default;
-$main-red: #bd150b !default;
-$main-red-rgb-015: rgba(189, 21, 11, 0.1) !default;
-$main-blue: #0076bd !default;
 $main-blue-rgb-015: rgba(0, 118, 189, 0.1) !default;
 
 a,
@@ -20,19 +13,18 @@ a:hover {
     flex-wrap: wrap;
     display: flex;
 
-    box-shadow: 0 4px 21px -12px rgba($shadow-color, 0.66);
+    box-shadow: 2px 2px 15px rgba($quaternary-color, 0.5);
     border-radius: 10px;
     margin: 0 0 2rem 0;
     overflow: hidden;
     position: relative;
-    color: #ffffff;
 
     &.light {
-        background-color: $secondary-color;
+        background-color: lighten($secondary-color, 5%);
     }
 
     .t-dark {
-        color: #18151f;
+        color: darken($primary-color, 10%);
     }
 
     a {
@@ -51,6 +43,48 @@ a:hover {
 
     .postcard__title {
         font-size: 1.75rem;
+
+        &--subtitle {
+            font-size: 0.8rem;
+            padding-bottom: 0.5rem;
+            font-weight: 400;
+            color: $quaternary-color;
+            &.is-invalid {
+                color: $invalid-color;
+            }
+        }
+
+        &--input {
+            font-size: 28px;
+            font-weight: 700;
+            width: 100%;
+            letter-spacing: 1px;
+            border: 1px solid rgba($primary-color, 0.3);
+            padding: 0.3rem;
+            transition: 0.4s;
+            background: transparent;
+
+            &:focus {
+                outline: 1px solid $primary-color;
+            }
+            &.is-invalid {
+                border: 1px solid $invalid-color;
+            }
+        }
+    }
+
+    .hidden-input {
+        position: absolute;
+        width: 0%;
+        height: 0%;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .postcard__subtitle {
+        &--icon {
+            margin-right: 0.5rem;
+        }
     }
 
     .postcard__img {
@@ -60,8 +94,20 @@ a:hover {
         position: relative;
     }
 
+    .create__img {
+        cursor: pointer;
+    }
+
     .postcard__img_link {
         display: contents;
+    }
+
+    .postcard__img--subtitle {
+        margin: 0 auto;
+        text-align: center;
+        & > .is-invalid {
+            color: $invalid-color;
+        }
     }
 
     .postcard__bar {
@@ -77,6 +123,7 @@ a:hover {
         position: relative;
         display: flex;
         flex-direction: column;
+        width: 100%;
     }
 
     .postcard__preview-txt {
@@ -84,6 +131,17 @@ a:hover {
         text-overflow: ellipsis;
         text-align: justify;
         height: 100%;
+    }
+
+    .postcard__preview--input {
+        width: 100%;
+        resize: vertical;
+        padding: 0.5rem;
+        min-height: 7rem;
+        &:focus {
+            outline: none;
+            border: 2px solid $primary-color;
+        }
     }
 
     .postcard__tagbox {
@@ -94,18 +152,70 @@ a:hover {
         padding: 0;
         justify-content: center;
 
+        &--icon {
+            margin-right: 0.5rem;
+        }
+
         .tag__item {
             display: inline-block;
-            background: rgba(83, 83, 83, 0.4);
+            background: rgba($quaternary-color, 0.4);
             border-radius: 3px;
-            padding: 2.5px 10px;
+            padding: 0.5rem;
             margin: 0 5px 5px 0;
             cursor: default;
             user-select: none;
             transition: background-color 0.3s;
 
+            &.submit {
+                background-color: $primary-color;
+                color: $secondary-color;
+                display: flex;
+                border-radius: $border-radius;
+                &.reset {
+                    background-color: $invalid-color;
+                }
+            }
+
+            &--link {
+                cursor: pointer;
+                &.link__submit {
+                    background-color: transparent;
+                    border: none;
+                    color: $secondary-color;
+                }
+                &.link__reset {
+                    background-color: transparent;
+                    border: none;
+                    color: $secondary-color;
+                }
+            }
+
+            &.positive {
+                background-color: rgba($valid-color, 0.3);
+
+                &.has-likes {
+                    background-color: rgba(limegreen, 0.8);
+                }
+                &:hover {
+                    background-color: rgba($valid-color, 0.8);
+                }
+            }
+
+            &.negative {
+                background-color: rgba($invalid-color, 0.3);
+                padding: 0.5rem;
+                &.has-dislikes {
+                    background-color: rgba(red, 0.8);
+                }
+                &:hover {
+                    background-color: rgba($invalid-color, 0.8);
+                }
+            }
+
             &:hover {
                 background: rgba(83, 83, 83, 0.8);
+                color: $secondary-color;
+                cursor: pointer;
             }
         }
     }
@@ -145,9 +255,12 @@ a:hover {
             transition: transform 0.3s ease;
         }
 
+        .unInputtedImage {
+            display: grid;
+        }
+
         .postcard__text {
             padding: 3rem;
-            width: 100%;
         }
 
         .media.postcard__text:before {
@@ -199,7 +312,7 @@ a:hover {
 
     .postcard.light {
         .postcard__text:before {
-            background: $secondary-color;
+            background: lighten($secondary-color, 5%);
         }
     }
 }
@@ -215,17 +328,17 @@ a:hover {
     background-color: $tertiary-color;
 }
 .blue::before {
-    background-image: linear-gradient(-30deg, $main-blue-rgb-015, transparent 50%);
+    background-image: linear-gradient(-30deg, rgba($quaternary-color, 0.2), transparent 50%);
 }
 .blue:nth-child(2n)::before {
-    background-image: linear-gradient(30deg, $main-blue-rgb-015, transparent 50%);
+    background-image: linear-gradient(30deg, rgba($quaternary-color, 0.2), transparent 50%);
 }
 
 @media screen and (min-width: 769px) {
     .blue::before {
-        background-image: linear-gradient(-80deg, $main-blue-rgb-015, transparent 50%);
+        background-image: linear-gradient(-80deg, rgba($quaternary-color, 0.2), transparent 50%);
     }
     .blue:nth-child(2n)::before {
-        background-image: linear-gradient(80deg, $main-blue-rgb-015, transparent 50%);
+        background-image: linear-gradient(80deg, rgba($quaternary-color, 0.2), transparent 50%);
     }
 }

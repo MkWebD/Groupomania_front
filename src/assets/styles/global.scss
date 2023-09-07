@@ -13,3 +13,7 @@
     color: inherit;
   }
 }
+
+.main-bg {
+  background: linear-gradient(to bottom, $primary-color, darken($primary-color, 10%), darken($primary-color, 20%));
+}
