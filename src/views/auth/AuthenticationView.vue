@@ -107,7 +107,6 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
 import * as yup from "yup";
-import "../../assets/styles/authForm.scss";
 import "./AuthenticationStyles.scss";
 
 // Creating router variables

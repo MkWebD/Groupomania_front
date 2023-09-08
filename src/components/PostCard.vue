@@ -2,14 +2,18 @@
 	<VeeForm v-slot="{ handleSubmit }" :validation-schema="submitPostSchema" as="div">
 		<form v-if="isAddingPost" @submit="handleSubmit($event, onSendPost)">
 			<article class="postcard light blue">
-				<a class="postcard__img_link" @click="clickFileInput" :class="{ unInputtedImage: !inputtedImage }">
-					<div class="postcard__img--subtitle" v-if="!inputtedImage">
+				<a
+					class="postcard__img_link"
+					@click="clickFileInput"
+					:class="{ unInputtedImage: !hasInputtedImageForCreation }"
+				>
+					<div class="postcard__img--subtitle" v-if="!hasInputtedImageForCreation">
 						Click the image to change it (required)
 						<div :class="{ 'is-invalid': imageError }">{{ imageError }}</div>
 					</div>
 					<Field name="image"
 						><input
-							ref="fileInputRef"
+							ref="fileInputRefForCreation"
 							class="hidden-input"
 							type="file"
 							clearable="true"
@@ -19,7 +23,7 @@
 					<img
 						class="postcard__img create__img"
 						alt="Image Title"
-						:src="previewImageUrl"
+						:src="previewImageUrlForCreation"
 						:class="{ 'is-invalid': imageError }"
 					/>
 				</a>
@@ -66,7 +70,7 @@
 						</li>
 						<li class="tag__item play blue reset" :class="{ submit: isAddingPost }">
 							<button class="tag__item--link link__reset" @click="reset()">
-								<font-awesome-icon :icon="['fas', 'paper-plane']" class="postcard__tagbox--icon" />Reset Form
+								<font-awesome-icon :icon="['fas', 'ban']" class="postcard__tagbox--icon" />Reset Form
 							</button>
 						</li>
 					</ul>
@@ -88,7 +92,7 @@
 					</div>
 					<Field name="updateImage" v-if="editingPostId === post._id"
 						><input
-							ref="updateFileInputRef"
+							ref="fileInputRefForUpdate"
 							class="hidden-input"
 							type="file"
 							clearable="true"
@@ -96,10 +100,10 @@
 							@change="handleUpdateFileChange"
 					/></Field>
 					<img
-						v-if="editingPostId === post._id && noUpdatedImage"
+						v-if="editingPostId === post._id && hasInputtedImageForUpdate"
 						class="postcard__img create__img"
 						alt="Image Title"
-						:src="updatePreviewImageUrl"
+						:src="previewImageUrlForUpdate"
 						:class="{ 'is-invalid': updateImageError }"
 					/>
 
@@ -107,14 +111,14 @@
 						class="postcard__img"
 						:src="post.imageUrl"
 						alt="Image Title"
-						v-if="!noUpdatedImage && editingPostId === post._id"
+						v-if="!hasInputtedImageForUpdate && editingPostId === post._id"
 					/>
 					<img class="postcard__img" :src="post.imageUrl" alt="Image Title" v-if="editingPostId !== post._id" />
 				</a>
 
 				<div class="postcard__text t-dark">
 					<h1 class="postcard__title blue">
-						<a :href="post._id" v-if="editingPostId !== post._id">{{ post.title }}</a>
+						<a v-if="editingPostId !== post._id">{{ post.title }}</a>
 						<Field
 							v-if="editingPostId === post._id"
 							v-model="updateTitle"
@@ -164,7 +168,7 @@
 						<li
 							class="tag__item play positive"
 							:class="{ 'has-likes': post.likes > 0 }"
-							@click.stop="likePost(post._id)"
+							@click.stop="likePost(post._id, post.usersDisliked)"
 							v-if="editingPostId !== post._id"
 						>
 							<a class="tag__item--link"
@@ -175,7 +179,7 @@
 						<li
 							class="tag__item play negative"
 							:class="{ 'has-dislikes': post.dislikes > 0 }"
-							@click.stop="dislikePost(post._id)"
+							@click.stop="dislikePost(post._id, post.usersLiked)"
 							v-if="editingPostId !== post._id"
 						>
 							<a class="tag__item--link"
@@ -184,7 +188,7 @@
 							>
 						</li>
 						<li
-							class="tag__item play"
+							class="tag__item play update"
 							@click.stop="openUpdatePostDialog(post._id)"
 							v-if="userId === post.userId && editingPostId !== post._id"
 						>
@@ -192,26 +196,26 @@
 								><font-awesome-icon :icon="['fas', 'pen-to-square']" class="postcard__tagbox--icon" />Modify post</a
 							>
 						</li>
-						<li class="tag__item play" v-if="editingPostId === post._id">
-							<button class="tag__item--link">
-								<font-awesome-icon :icon="['fas', 'trash']" class="postcard__tagbox--icon" />Submit update
+						<li class="tag__item play submit" v-if="editingPostId === post._id">
+							<button class="tag__item--link link__submit">
+								<font-awesome-icon :icon="['fas', 'share']" class="postcard__tagbox--icon" />Submit update
 							</button>
 						</li>
 						<li
-							class="tag__item play"
+							class="tag__item play reset submit"
 							@click.stop="cancelUpdatePostDialog()"
 							v-if="userId === post.userId && editingPostId === post._id"
 						>
-							<a class="tag__item--link"
-								><font-awesome-icon :icon="['fas', 'trash']" class="postcard__tagbox--icon" />Cancel update</a
+							<a class="tag__item--link link__reset"
+								><font-awesome-icon :icon="['fas', 'ban']" class="postcard__tagbox--icon" />Cancel update</a
 							>
 						</li>
 						<li
-							class="tag__item play"
+							class="tag__item play reset submit"
 							@click.stop="showConfirmationDialog(post._id)"
 							v-if="userId === post.userId && editingPostId !== post._id"
 						>
-							<a class="tag__item--link"
+							<a class="tag__item--link link__reset"
 								><font-awesome-icon :icon="['fas', 'trash']" class="postcard__tagbox--icon" />Delete post</a
 							>
 						</li>
@@ -221,7 +225,7 @@
 		</form>
 	</VeeForm>
 	<ConfirmationPopup
-		v-if="showDialog"
+		v-if="displayDeleteConfirmation"
 		message="Are you sure you want to delete this post?"
 		:onConfirm="deleteConfirmed"
 		:onCancel="cancelDelete"
@@ -240,28 +244,36 @@ import { PostCallback, type PostObject } from "./types";
 
 const router = useRouter();
 
-const serverUrl = "https://server.kevinmas.com/groupomania/api/post/";
+const serverUrl = "https://server.kevinmas.com/groupomania/api/post";
 const { userId, token } = JSON.parse(localStorage.user);
-const previewImageUrl = ref<string>(placeholderImage);
-const updatePreviewImageUrl = ref<string>("");
-const fileInputRef = ref<HTMLInputElement | null>(null);
-const updateFileInputRef = ref<HTMLInputElement[] | null>(null);
-const inputtedImage = ref<boolean>(false);
-const noUpdatedImage = ref<boolean>(false);
+const previewImageUrlForCreation = ref<string>(placeholderImage);
+const previewImageUrlForUpdate = ref<string>("");
+const fileInputRefForCreation = ref<HTMLInputElement | null>(null);
+const fileInputRefForUpdate = ref<HTMLInputElement[] | null>(null);
+const hasInputtedImageForCreation = ref<boolean>(false);
+const hasInputtedImageForUpdate = ref<boolean>(false);
 const posts = ref<PostObject[]>([]);
 const like = ref(0);
-const showDialog = ref(false);
-const postBeforeUpdate = ref({ title: "", content: "" });
-//Change this to focusedPostId maybe
+const displayDeleteConfirmation = ref(false);
+const editedPostDataBeforeUpdate = ref({ title: "", content: "" });
 const postIdToDelete = ref<string | null>(null);
 const editingPostId = ref<string | null>(null);
-const requestOptions: { method: string; mode: "cors"; headers: { Authorization: string } } = {
+
+const getOptions: { method: string; mode: "cors"; headers: { Authorization: string } } = {
 	method: "GET",
 	mode: "cors",
 	headers: {
 		Authorization: `token ${token}`,
 	},
 };
+const deleteOptions: { method: string; mode: "cors"; headers: { Authorization: string } } = {
+	method: "DELETE",
+	mode: "cors",
+	headers: {
+		Authorization: `token ${token}`,
+	},
+};
+
 const { value: title, errorMessage: titleError } = useField("title", yup.string().min(3).max(30));
 const { value: updateTitle, errorMessage: updateTitleError } = useField("updateTitle", yup.string().min(3).max(30));
 const { value: content, errorMessage: contentError } = useField("content", yup.string().min(5).max(3000));
@@ -282,28 +294,10 @@ const submitUpdateSchema = yup.object({
 	updateContent: yup.string().min(5).max(3000),
 });
 
-const showConfirmationDialog = (postId: string) => {
-	showDialog.value = true;
-	postIdToDelete.value = postId;
-};
-
-const deleteConfirmed = () => {
-	if (postIdToDelete.value) {
-		deletePost(postIdToDelete.value);
-		postIdToDelete.value = null; // Reset postIdToDelete
-	}
-	showDialog.value = false; // Hide the dialog
-};
-
-const cancelDelete = () => {
-	showDialog.value = false; // Hide the dialog
-	postIdToDelete.value = null; // Reset postIdToDelete
-};
-
 defineProps<{ isAddingPost: boolean }>();
 
 onMounted(() => {
-	fetch(serverUrl, requestOptions)
+	fetch(serverUrl, getOptions)
 		.then((res) => {
 			if (res.ok) {
 				return res.json();
@@ -313,6 +307,24 @@ onMounted(() => {
 		.catch((err) => console.error(err.message));
 });
 
+const showConfirmationDialog = (postId: string) => {
+	displayDeleteConfirmation.value = true;
+	postIdToDelete.value = postId;
+};
+
+const deleteConfirmed = () => {
+	if (postIdToDelete.value) {
+		deletePost(postIdToDelete.value);
+		postIdToDelete.value = null;
+	}
+	displayDeleteConfirmation.value = false;
+};
+
+const cancelDelete = () => {
+	displayDeleteConfirmation.value = false;
+	postIdToDelete.value = null;
+};
+
 const handleFileChange = (event: Event) => {
 	const fileInput = event.target as HTMLInputElement;
 	const file = fileInput.files?.[0];
@@ -321,27 +333,19 @@ const handleFileChange = (event: Event) => {
 		const reader = new FileReader();
 		reader.onload = () => {
 			image.value = [file];
-			previewImageUrl.value = reader.result as string;
-			inputtedImage.value = true;
+			previewImageUrlForCreation.value = reader.result as string;
+			hasInputtedImageForCreation.value = true;
 		};
 		reader.readAsDataURL(file);
 	}
 };
 const clickFileInput = () => {
-	const fileInput = fileInputRef.value;
+	const fileInput = fileInputRefForCreation.value;
 	console.log(fileInput);
 	if (fileInput) {
 		fileInput.click();
 	}
 };
-
-const clickUpdateFileInput = () => {
-	const fileInput = updateFileInputRef.value ? updateFileInputRef.value[0] : null;
-	if (fileInput) {
-		fileInput.click();
-	}
-};
-
 const handleUpdateFileChange = (event: Event) => {
 	const fileInput = event.target as HTMLInputElement;
 	const file = fileInput.files?.[0];
@@ -350,10 +354,17 @@ const handleUpdateFileChange = (event: Event) => {
 		const reader = new FileReader();
 		reader.onload = () => {
 			updateImage.value = [file];
-			updatePreviewImageUrl.value = reader.result as string;
-			noUpdatedImage.value = true;
+			previewImageUrlForUpdate.value = reader.result as string;
+			hasInputtedImageForUpdate.value = true;
 		};
 		reader.readAsDataURL(file);
+	}
+};
+
+const clickUpdateFileInput = () => {
+	const fileInput = fileInputRefForUpdate.value ? fileInputRefForUpdate.value[0] : null;
+	if (fileInput) {
+		fileInput.click();
 	}
 };
 
@@ -404,14 +415,6 @@ const callFetch = (
 		.catch((err) => console.error(err.message));
 };
 
-const deleteOptions: { method: string; mode: "cors"; headers: { Authorization: string } } = {
-	method: "DELETE",
-	mode: "cors",
-	headers: {
-		Authorization: `token ${token}`,
-	},
-};
-
 const deletePost = (id: string) => {
 	console.log(id);
 	callFetch(`${serverUrl}/${id}`, deleteOptions, () => {
@@ -420,7 +423,10 @@ const deletePost = (id: string) => {
 	});
 };
 
-const likePost = (id: string) => {
+const likePost = (id: string, usersDisliked: string[]) => {
+	if (usersDisliked.includes(userId)) {
+		return;
+	}
 	let likeValue = {};
 	const likeObject = () => {
 		switch (like.value) {
@@ -456,12 +462,15 @@ const likePost = (id: string) => {
 		body: JSON.stringify(likeValue),
 	};
 
-	callFetch(`${serverUrl}${id}/like`, likeOptions, () => {
+	callFetch(`${serverUrl}/${id}/like`, likeOptions, () => {
 		getData(id);
 	});
 };
 
-const dislikePost = (id: string) => {
+const dislikePost = (id: string, usersLiked: string[]) => {
+	if (usersLiked.includes(userId)) {
+		return;
+	}
 	let dislikeValue = {};
 	const dislikeObject = () => {
 		switch (like.value) {
@@ -497,21 +506,13 @@ const dislikePost = (id: string) => {
 		body: JSON.stringify(dislikeValue),
 	};
 
-	callFetch(`${serverUrl}${id}/like`, dislikeOptions, () => {
+	callFetch(`${serverUrl}/${id}/like`, dislikeOptions, () => {
 		getData(id);
 	});
 };
 
-const getOptions: { method: string; mode: "cors"; headers: { Authorization: string } } = {
-	method: "GET",
-	mode: "cors",
-	headers: {
-		Authorization: `token ${token}`,
-	},
-};
-
 const getData = (id?: string) => {
-	callFetch(`${serverUrl}${id}`, getOptions, (data) => {
+	callFetch(`${serverUrl}/${id}`, getOptions, (data) => {
 		const postIndex = posts.value.findIndex((post) => post._id === data._id);
 		posts.value[postIndex] = data;
 	});
@@ -523,25 +524,25 @@ const openUpdatePostDialog = (id: string) => {
 	updateTitle.value = editedPost.title;
 	updateContent.value = editedPost.content;
 	updateImage.value = undefined;
-	noUpdatedImage.value = false;
-	postBeforeUpdate.value = { title: editedPost.title, content: editedPost.content };
+	hasInputtedImageForUpdate.value = false;
+	editedPostDataBeforeUpdate.value = { title: editedPost.title, content: editedPost.content };
 };
 
 const cancelUpdatePostDialog = () => {
 	const editedPostIndex = posts.value.findIndex((post) => post._id === editingPostId.value);
-	posts.value[editedPostIndex].title = postBeforeUpdate.value.title;
-	posts.value[editedPostIndex].content = postBeforeUpdate.value.content;
+	posts.value[editedPostIndex].title = editedPostDataBeforeUpdate.value.title;
+	posts.value[editedPostIndex].content = editedPostDataBeforeUpdate.value.content;
 	updateImage.value = undefined;
-	noUpdatedImage.value = false;
+	hasInputtedImageForUpdate.value = false;
 	editingPostId.value = null;
 };
 
 const reset = () => {
 	title.value = "";
 	content.value = "";
-	previewImageUrl.value = placeholderImage;
-	inputtedImage.value = false;
-	fileInputRef.value = null;
+	previewImageUrlForCreation.value = placeholderImage;
+	hasInputtedImageForCreation.value = false;
+	fileInputRefForCreation.value = null;
 	image.value = undefined;
 	imageError.value = "";
 };
@@ -555,7 +556,7 @@ const onUpdatePost = (values: unknown) => {
 		formData.append("image", updateImage.value[0]);
 	}
 
-	fetch(`${serverUrl}${editingPostId.value}`, {
+	fetch(`${serverUrl}/${editingPostId.value}`, {
 		method: "PUT",
 		mode: "cors",
 		headers: {
