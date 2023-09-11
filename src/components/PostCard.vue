@@ -1,6 +1,6 @@
 <template>
 	<VeeForm v-slot="{ handleSubmit }" :validation-schema="submitPostSchema" as="div">
-		<form v-if="isAddingPost" @submit="handleSubmit($event, onSendPost)">
+		<form v-if="isAddingPost" @submit="handleSubmit($event, createPost)">
 			<article class="postcard light blue">
 				<a
 					class="postcard__img_link"
@@ -18,6 +18,7 @@
 							type="file"
 							clearable="true"
 							accept="image/*"
+							data-type="creation"
 							@change="handleFileChange"
 					/></Field>
 					<img
@@ -63,13 +64,13 @@
 						</div>
 					</div>
 					<ul class="postcard__tagbox">
-						<li class="tag__item play blue" :class="{ submit: isAddingPost }">
-							<button class="tag__item--link link__submit">
+						<li class="tag__item play blue submit">
+							<button class="tag__item--link">
 								<font-awesome-icon :icon="['fas', 'paper-plane']" class="postcard__tagbox--icon" />Submit your post
 							</button>
 						</li>
-						<li class="tag__item play blue reset" :class="{ submit: isAddingPost }">
-							<button class="tag__item--link link__reset" @click="reset()">
+						<li class="tag__item play blue warning">
+							<button class="tag__item--link" @click="reset()">
 								<font-awesome-icon :icon="['fas', 'ban']" class="postcard__tagbox--icon" />Reset Form
 							</button>
 						</li>
@@ -79,7 +80,7 @@
 		</form>
 	</VeeForm>
 	<VeeForm v-slot="{ handleSubmit }" :validation-schema="submitUpdateSchema" as="div">
-		<form @submit="handleSubmit($event, onUpdatePost)">
+		<form @submit="handleSubmit($event, updatePost)">
 			<article class="postcard light blue" v-for="post in posts" :key="post._id">
 				<a
 					class="postcard__img_link"
@@ -97,7 +98,8 @@
 							type="file"
 							clearable="true"
 							accept="image/*"
-							@change="handleUpdateFileChange"
+							data-type="update"
+							@change="handleFileChange"
 					/></Field>
 					<img
 						v-if="editingPostId === post._id && hasInputtedImageForUpdate"
@@ -166,58 +168,58 @@
 
 					<ul class="postcard__tagbox">
 						<li
-							class="tag__item play positive"
+							class="tag__item positive"
 							:class="{ 'has-likes': post.likes > 0 }"
 							@click.stop="likePost(post._id, post.usersDisliked)"
 							v-if="editingPostId !== post._id"
 						>
-							<a class="tag__item--link"
-								><font-awesome-icon :icon="['fas', 'thumbs-up']" class="postcard__tagbox--icon" />Total likes :
-								{{ post.likes }}</a
-							>
+							<button type="button" class="tag__item--link positive__link">
+								<font-awesome-icon :icon="['fas', 'thumbs-up']" class="postcard__tagbox--icon" />Total likes :
+								{{ post.likes }}
+							</button>
 						</li>
 						<li
-							class="tag__item play negative"
+							class="tag__item negative"
 							:class="{ 'has-dislikes': post.dislikes > 0 }"
 							@click.stop="dislikePost(post._id, post.usersLiked)"
 							v-if="editingPostId !== post._id"
 						>
-							<a class="tag__item--link"
-								><font-awesome-icon :icon="['fas', 'thumbs-down']" class="postcard__tagbox--icon" />Total dislikes :
-								{{ post.dislikes }}</a
-							>
+							<button class="tag__item--link negative__link">
+								<font-awesome-icon :icon="['fas', 'thumbs-down']" class="postcard__tagbox--icon" />Total dislikes :
+								{{ post.dislikes }}
+							</button>
 						</li>
 						<li
-							class="tag__item play update"
+							class="tag__item play submit"
 							@click.stop="openUpdatePostDialog(post._id)"
 							v-if="userId === post.userId && editingPostId !== post._id"
 						>
-							<a class="tag__item--link"
-								><font-awesome-icon :icon="['fas', 'pen-to-square']" class="postcard__tagbox--icon" />Modify post</a
-							>
+							<button class="tag__item--link">
+								<font-awesome-icon :icon="['fas', 'pen-to-square']" class="postcard__tagbox--icon" />Modify post
+							</button>
 						</li>
-						<li class="tag__item play submit" v-if="editingPostId === post._id">
-							<button class="tag__item--link link__submit">
+						<li class="tag__item submit" v-if="editingPostId === post._id">
+							<button class="tag__item--link">
 								<font-awesome-icon :icon="['fas', 'share']" class="postcard__tagbox--icon" />Submit update
 							</button>
 						</li>
 						<li
-							class="tag__item play reset submit"
+							class="tag__item play warning"
 							@click.stop="cancelUpdatePostDialog()"
 							v-if="userId === post.userId && editingPostId === post._id"
 						>
-							<a class="tag__item--link link__reset"
-								><font-awesome-icon :icon="['fas', 'ban']" class="postcard__tagbox--icon" />Cancel update</a
-							>
+							<button class="tag__item--link">
+								<font-awesome-icon :icon="['fas', 'ban']" class="postcard__tagbox--icon" />Cancel update
+							</button>
 						</li>
 						<li
-							class="tag__item play reset submit"
+							class="tag__item play warning"
 							@click.stop="showConfirmationDialog(post._id)"
 							v-if="userId === post.userId && editingPostId !== post._id"
 						>
-							<a class="tag__item--link link__reset"
-								><font-awesome-icon :icon="['fas', 'trash']" class="postcard__tagbox--icon" />Delete post</a
-							>
+							<button type="button" class="tag__item--link">
+								<font-awesome-icon :icon="['fas', 'trash']" class="postcard__tagbox--icon" />Delete post
+							</button>
 						</li>
 					</ul>
 				</div>
@@ -238,9 +240,10 @@ import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import * as yup from "yup";
 import placeholderImage from "../assets/images/placeholder-image.png";
+import { callFetch } from "../utils/helpers";
 import ConfirmationPopup from "./ConfirmationPopup.vue";
 import "./PostCard.scss";
-import { PostCallback, type PostObject } from "./types";
+import { type PostObject } from "./types";
 
 const router = useRouter();
 
@@ -258,21 +261,6 @@ const displayDeleteConfirmation = ref(false);
 const editedPostDataBeforeUpdate = ref({ title: "", content: "" });
 const postIdToDelete = ref<string | null>(null);
 const editingPostId = ref<string | null>(null);
-
-const getOptions: { method: string; mode: "cors"; headers: { Authorization: string } } = {
-	method: "GET",
-	mode: "cors",
-	headers: {
-		Authorization: `token ${token}`,
-	},
-};
-const deleteOptions: { method: string; mode: "cors"; headers: { Authorization: string } } = {
-	method: "DELETE",
-	mode: "cors",
-	headers: {
-		Authorization: `token ${token}`,
-	},
-};
 
 const { value: title, errorMessage: titleError } = useField("title", yup.string().min(3).max(30));
 const { value: updateTitle, errorMessage: updateTitleError } = useField("updateTitle", yup.string().min(3).max(30));
@@ -297,15 +285,197 @@ const submitUpdateSchema = yup.object({
 defineProps<{ isAddingPost: boolean }>();
 
 onMounted(() => {
-	fetch(serverUrl, getOptions)
-		.then((res) => {
-			if (res.ok) {
-				return res.json();
-			}
-		})
-		.then((data: PostObject[]) => (posts.value = data))
-		.catch((err) => console.error(err.message));
+	callFetch<PostObject[]>(
+		serverUrl,
+		{
+			method: "GET",
+			mode: "cors",
+			headers: {
+				Authorization: `token ${token}`,
+			},
+		},
+		(data) => {
+			posts.value = data;
+		}
+	);
 });
+
+//CRUD Functions
+
+const createPost = (values: unknown) => {
+	imageError.value = "";
+	const formValues = values as { title: string; content: string; image: File[] };
+	if (!image.value) {
+		imageError.value = "Image is required";
+		return;
+	} else {
+		const formData = new FormData();
+		formData.append("title", formValues.title);
+		formData.append("content", formValues.content);
+		formData.append("userId", userId);
+		formData.append("image", image.value[0]);
+
+		callFetch(
+			serverUrl,
+			{
+				method: "POST",
+				mode: "cors",
+				headers: {
+					Authorization: `token ${token}`,
+				},
+				body: formData,
+			},
+			() => {
+				router.push({ path: "/" });
+				router.go(0);
+			}
+		);
+	}
+};
+
+const readPost = (id?: string) => {
+	callFetch<PostObject>(
+		`${serverUrl}/${id}`,
+		{
+			method: "GET",
+			mode: "cors",
+			headers: {
+				Authorization: `token ${token}`,
+			},
+		},
+		(data) => {
+			const postIndex = posts.value.findIndex((post) => post._id === data._id);
+			posts.value[postIndex] = data;
+		}
+	);
+};
+
+const updatePost = (values: unknown) => {
+	const formValues = values as { updateTitle: string; updateContent: string; updateImage: File[] };
+	const formData = new FormData();
+	formData.append("title", formValues.updateTitle);
+	formData.append("content", formValues.updateContent);
+	if (updateImage.value) {
+		formData.append("image", updateImage.value[0]);
+	}
+
+	callFetch<PostObject>(
+		`${serverUrl}/${editingPostId.value}`,
+		{
+			method: "PUT",
+			mode: "cors",
+			headers: {
+				Authorization: `token ${token}`,
+			},
+			body: formData,
+		},
+		() => {
+			router.push({ path: "/" });
+			router.go(0);
+		}
+	);
+};
+
+const deletePost = (id: string) => {
+	callFetch(
+		`${serverUrl}/${id}`,
+		{
+			method: "DELETE",
+			mode: "cors",
+			headers: {
+				Authorization: `token ${token}`,
+			},
+		},
+		() => {
+			router.push({ path: "/" });
+			router.go(0);
+		}
+	);
+};
+
+const likePost = (id: string, usersDisliked: string[]) => {
+	const editedPost = posts.value.find((post) => post._id === id) as PostObject;
+	const hasLike = editedPost.usersLiked.includes(userId);
+	if (usersDisliked.includes(userId)) {
+		return;
+	}
+	let likeValue = {};
+	const likeObject = () => {
+		switch (hasLike) {
+			case true:
+				return (likeValue = {
+					like: 0,
+					userId,
+				});
+			case false:
+				return (likeValue = {
+					like: 1,
+					userId,
+				});
+		}
+	};
+
+	likeObject();
+
+	callFetch(
+		`${serverUrl}/${id}/like`,
+		{
+			method: "POST",
+			mode: "cors",
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `token ${token}`,
+			},
+			body: JSON.stringify(likeValue),
+		},
+		() => {
+			readPost(id);
+		}
+	);
+};
+
+const dislikePost = (id: string, usersLiked: string[]) => {
+	const editedPost = posts.value.find((post) => post._id === id) as PostObject;
+	const hasDislike = editedPost.usersDisliked.includes(userId);
+	if (usersLiked.includes(userId)) {
+		return;
+	}
+	let dislikeValue = {};
+	const dislikeObject = () => {
+		switch (hasDislike) {
+			case true:
+				return (dislikeValue = {
+					like: 0,
+					userId,
+				});
+			case false:
+				return (dislikeValue = {
+					like: -1,
+					userId,
+				});
+		}
+	};
+
+	dislikeObject();
+
+	callFetch(
+		`${serverUrl}/${id}/like`,
+		{
+			method: "POST",
+			mode: "cors",
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `token ${token}`,
+			},
+			body: JSON.stringify(dislikeValue),
+		},
+		() => {
+			readPost(id);
+		}
+	);
+};
+
+//POPUP Functions
 
 const showConfirmationDialog = (postId: string) => {
 	displayDeleteConfirmation.value = true;
@@ -325,39 +495,37 @@ const cancelDelete = () => {
 	postIdToDelete.value = null;
 };
 
+//FILE INPUT Functions
+
 const handleFileChange = (event: Event) => {
 	const fileInput = event.target as HTMLInputElement;
+	const typeOfInput = fileInput.dataset.type;
 	const file = fileInput.files?.[0];
 
 	if (file) {
 		const reader = new FileReader();
 		reader.onload = () => {
-			image.value = [file];
-			previewImageUrlForCreation.value = reader.result as string;
-			hasInputtedImageForCreation.value = true;
+			switch (typeOfInput) {
+				case "creation":
+					image.value = [file];
+					previewImageUrlForCreation.value = reader.result as string;
+					hasInputtedImageForCreation.value = true;
+					break;
+				case "update":
+					updateImage.value = [file];
+					previewImageUrlForUpdate.value = reader.result as string;
+					hasInputtedImageForUpdate.value = true;
+					break;
+			}
 		};
 		reader.readAsDataURL(file);
 	}
 };
+
 const clickFileInput = () => {
 	const fileInput = fileInputRefForCreation.value;
-	console.log(fileInput);
 	if (fileInput) {
 		fileInput.click();
-	}
-};
-const handleUpdateFileChange = (event: Event) => {
-	const fileInput = event.target as HTMLInputElement;
-	const file = fileInput.files?.[0];
-
-	if (file) {
-		const reader = new FileReader();
-		reader.onload = () => {
-			updateImage.value = [file];
-			previewImageUrlForUpdate.value = reader.result as string;
-			hasInputtedImageForUpdate.value = true;
-		};
-		reader.readAsDataURL(file);
 	}
 };
 
@@ -368,155 +536,7 @@ const clickUpdateFileInput = () => {
 	}
 };
 
-const onSendPost = (values: unknown) => {
-	imageError.value = "";
-	const formValues = values as { title: string; content: string; image: File[] };
-	console.log(image);
-	if (!image.value) {
-		imageError.value = "Image is required";
-		return;
-	} else {
-		const formData = new FormData();
-		formData.append("title", formValues.title);
-		formData.append("content", formValues.content);
-		formData.append("userId", userId);
-		formData.append("image", image.value[0]);
-
-		fetch(serverUrl, {
-			method: "POST",
-			mode: "cors",
-			headers: {
-				Authorization: `token ${token}`,
-			},
-			body: formData,
-		})
-			.then((res) => {
-				if (res.status === 201) {
-					router.push({ path: "/" });
-					router.go(0);
-				}
-			})
-			.catch((err) => console.error(err.message));
-	}
-};
-
-const callFetch = (
-	url: string,
-	options: { method: string; mode: "cors"; headers: { Authorization: string } },
-	cb: PostCallback
-) => {
-	return fetch(url, options)
-		.then((res) => {
-			if (res.ok) {
-				return res.json();
-			}
-		})
-		.then((data: PostObject) => cb(data))
-		.catch((err) => console.error(err.message));
-};
-
-const deletePost = (id: string) => {
-	console.log(id);
-	callFetch(`${serverUrl}/${id}`, deleteOptions, () => {
-		router.push({ path: "/" });
-		router.go(0);
-	});
-};
-
-const likePost = (id: string, usersDisliked: string[]) => {
-	if (usersDisliked.includes(userId)) {
-		return;
-	}
-	let likeValue = {};
-	const likeObject = () => {
-		switch (like.value) {
-			case 0:
-				like.value = 1;
-				return (likeValue = {
-					like: 1,
-					userId: userId,
-				});
-			case 1:
-				like.value = 0;
-				return (likeValue = {
-					like: 0,
-					userId: userId,
-				});
-		}
-	};
-
-	likeObject();
-
-	const likeOptions: {
-		method: string;
-		mode: "cors";
-		headers: { "Content-Type": string; Authorization: string };
-		body: string;
-	} = {
-		method: "POST",
-		mode: "cors",
-		headers: {
-			"Content-Type": "application/json",
-			Authorization: `token ${token}`,
-		},
-		body: JSON.stringify(likeValue),
-	};
-
-	callFetch(`${serverUrl}/${id}/like`, likeOptions, () => {
-		getData(id);
-	});
-};
-
-const dislikePost = (id: string, usersLiked: string[]) => {
-	if (usersLiked.includes(userId)) {
-		return;
-	}
-	let dislikeValue = {};
-	const dislikeObject = () => {
-		switch (like.value) {
-			case 0:
-				like.value = -1;
-				return (dislikeValue = {
-					like: -1,
-					userId: userId,
-				});
-			case -1:
-				like.value = 0;
-				return (dislikeValue = {
-					like: 0,
-					userId: userId,
-				});
-		}
-	};
-
-	dislikeObject();
-
-	const dislikeOptions: {
-		method: string;
-		mode: "cors";
-		headers: { "Content-Type": string; Authorization: string };
-		body: string;
-	} = {
-		method: "POST",
-		mode: "cors",
-		headers: {
-			"Content-Type": "application/json",
-			Authorization: `token ${token}`,
-		},
-		body: JSON.stringify(dislikeValue),
-	};
-
-	callFetch(`${serverUrl}/${id}/like`, dislikeOptions, () => {
-		getData(id);
-	});
-};
-
-const getData = (id?: string) => {
-	callFetch(`${serverUrl}/${id}`, getOptions, (data) => {
-		const postIndex = posts.value.findIndex((post) => post._id === data._id);
-		posts.value[postIndex] = data;
-	});
-};
+//UPDATE DIALOG Functions
 
 const openUpdatePostDialog = (id: string) => {
 	editingPostId.value = id;
@@ -537,6 +557,8 @@ const cancelUpdatePostDialog = () => {
 	editingPostId.value = null;
 };
 
+//RESET FORM Function
+
 const reset = () => {
 	title.value = "";
 	content.value = "";
@@ -545,31 +567,5 @@ const reset = () => {
 	fileInputRefForCreation.value = null;
 	image.value = undefined;
 	imageError.value = "";
-};
-
-const onUpdatePost = (values: unknown) => {
-	const formValues = values as { updateTitle: string; updateContent: string; updateImage: File[] };
-	const formData = new FormData();
-	formData.append("title", formValues.updateTitle);
-	formData.append("content", formValues.updateContent);
-	if (updateImage.value) {
-		formData.append("image", updateImage.value[0]);
-	}
-
-	fetch(`${serverUrl}/${editingPostId.value}`, {
-		method: "PUT",
-		mode: "cors",
-		headers: {
-			Authorization: `token ${token}`,
-		},
-		body: formData,
-	})
-		.then((res) => {
-			if (res.status === 200) {
-				router.push({ path: "/" });
-				router.go(0);
-			}
-		})
-		.catch((err) => console.error(err.message));
 };
 </script>

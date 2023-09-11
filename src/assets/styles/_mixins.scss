@@ -53,3 +53,14 @@
         transform: scale(0.95);
     }
 }
+
+@mixin hoverTagItemLink($backgroundColor, $textColor, $isLike: null) {
+    &:hover {
+        background-color: $textColor;
+        color: $backgroundColor;
+        border: 1px solid $backgroundColor;
+        & > button {
+            color: $backgroundColor;
+        }
+    }
+}

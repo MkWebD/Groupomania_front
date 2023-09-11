@@ -159,63 +159,62 @@ a:hover {
         .tag__item {
             display: inline-block;
             background: rgba($quaternary-color, 0.4);
-            border-radius: 3px;
             padding: 0.5rem;
             margin: 0 5px 5px 0;
-            cursor: default;
+            cursor: pointer;
             user-select: none;
             transition: background-color 0.3s;
+            border-radius: $border-radius;
+            border: 1px solid transparent;
+
+            & > button {
+                background-color: transparent;
+                border: none;
+                color: $secondary-color;
+                cursor: pointer;
+                font-weight: 700;
+            }
+            &--link {
+                font-weight: 700;
+            }
 
             &.submit {
                 background-color: $primary-color;
                 color: $secondary-color;
-                display: flex;
-                border-radius: $border-radius;
-                &.reset {
-                    background-color: $invalid-color;
-                }
+                @include hoverTagItemLink($primary-color, $secondary-color);
             }
 
-            &--link {
-                cursor: pointer;
-                &.link__submit {
-                    background-color: transparent;
-                    border: none;
-                    color: $secondary-color;
-                }
-                &.link__reset {
-                    background-color: transparent;
-                    border: none;
-                    color: $secondary-color;
-                }
+            &.warning {
+                background-color: $invalid-color;
+                color: $secondary-color;
+                @include hoverTagItemLink($invalid-color, $secondary-color);
             }
 
             &.positive {
                 background-color: rgba($valid-color, 0.3);
+                color: $primary-color;
+                & > .positive__link {
+                    color: $primary-color;
+                }
+                @include hoverTagItemLink($valid-color, $secondary-color);
 
                 &.has-likes {
                     background-color: rgba(limegreen, 0.8);
-                }
-                &:hover {
-                    background-color: rgba($valid-color, 0.8);
+                    @include hoverTagItemLink($valid-color, $secondary-color);
                 }
             }
 
             &.negative {
                 background-color: rgba($invalid-color, 0.3);
-                padding: 0.5rem;
+                color: $primary-color;
+                & > .negative__link {
+                    color: $primary-color;
+                }
+                @include hoverTagItemLink($invalid-color, $secondary-color);
                 &.has-dislikes {
                     background-color: rgba(red, 0.8);
+                    @include hoverTagItemLink($invalid-color, $secondary-color);
                 }
-                &:hover {
-                    background-color: rgba($invalid-color, 0.8);
-                }
-            }
-
-            &:hover {
-                background: rgba(83, 83, 83, 0.8);
-                color: $secondary-color;
-                cursor: pointer;
             }
         }
     }
@@ -318,9 +317,6 @@ a:hover {
 }
 
 /* COLORS */
-.postcard .postcard__tagbox .blue.play:hover {
-    background: $tertiary-color;
-}
 .blue .postcard__title:hover {
     color: $tertiary-color;
 }

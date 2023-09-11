@@ -10,7 +10,3 @@ export type PostObject = {
 	usersLiked: string[];
 	usersDisliked: string[];
 };
-
-export interface PostCallback {
-	(message: PostObject): void;
-}
