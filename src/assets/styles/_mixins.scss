@@ -1,0 +1,66 @@
+@mixin linear-gradient($direction, $color-stops...) {
+    background: nth(nth($color-stops, 1), 1);
+    background: -webkit-linear-gradient(legacy-direction($direction), $color-stops);
+    background: linear-gradient($direction, $color-stops);
+}
+
+@mixin border-radius($radius) {
+    -webkit-border-radius: $radius;
+    -moz-border-radius: $radius;
+    border-radius: $radius;
+}
+
+@mixin flex-center($alignment: center, $justification: center, $direction: null) {
+    display: flex;
+    align-items: $alignment;
+    justify-content: $justification;
+
+    @if $direction != null {
+        flex-direction: $direction;
+    }
+}
+
+@mixin button($textColor, $firstGradientColor, $secondGradientColor) {
+    margin: 10px;
+    padding: 15px 30px;
+    text-align: center;
+    text-transform: uppercase;
+    transition: 0.5s;
+    background-size: 200% auto;
+    color: $textColor;
+    border-radius: 10px;
+    display: block;
+    border: 0px;
+    font-weight: 700;
+    box-shadow: 0px 0px 14px -7px $secondGradientColor;
+    background-image: linear-gradient(
+        45deg,
+        $firstGradientColor 0%,
+        $secondGradientColor 51%,
+        $firstGradientColor 100%
+    );
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+
+    &:hover {
+        background-position: right center;
+        color: $textColor;
+        text-decoration: none;
+    }
+    &:active {
+        transform: scale(0.95);
+    }
+}
+
+@mixin hoverTagItemLink($backgroundColor, $textColor, $isLike: null) {
+    &:hover {
+        background-color: $textColor;
+        color: $backgroundColor;
+        border: 1px solid $backgroundColor;
+        & > button {
+            color: $backgroundColor;
+        }
+    }
+}

@@ -1,0 +1,29 @@
+@import "../../assets/styles/variables";
+@import "../../assets/styles/mixins";
+
+.posts {
+    min-height: 93vh;
+    @include flex-center;
+    &__container {
+        color: $tertiary-color;
+        max-width: 1140px;
+        padding: 0 0.5rem;
+    }
+    &__header {
+        color: $secondary-color;
+        margin-bottom: 1.5rem;
+        &--title {
+            padding: 2rem 0;
+            text-transform: uppercase;
+            text-align: center;
+            font-size: 3rem;
+        }
+        &--menu {
+            @include flex-center;
+        }
+    }
+    &__button {
+        @include button($secondary-color, $tertiary-color, $quaternary-color);
+        font-size: large;
+    }
+}

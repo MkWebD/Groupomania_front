@@ -1,0 +1,70 @@
+@import "../assets/styles/variables.scss";
+
+.dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    padding: 1.5rem;
+    border: 1px solid $quaternary-color;
+    background-color: $secondary-color;
+    box-shadow: 0 0 10px rgba($shadow-color, 0.2);
+    border-radius: 1rem;
+    z-index: 10;
+    opacity: 1;
+    display: block;
+
+    &__message {
+        padding-bottom: 1.5rem;
+        color: $primary-color;
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    &__buttons {
+        display: flex;
+        justify-content: space-evenly;
+        &--confirm {
+            background-color: $valid-color;
+            padding: 0.5rem 1rem;
+            margin-right: 0.4rem;
+            border: none;
+            cursor: pointer;
+            color: $secondary-color;
+            border-radius: $border-radius;
+            transition: background-color 0.3s ease-in-out;
+            font-weight: 700;
+            &:hover {
+                background-color: darken($valid-color, 10%);
+            }
+        }
+        &--cancel {
+            background-color: $invalid-color;
+            padding: 0.5rem 1rem;
+            margin-right: 0.4rem;
+            border: none;
+            cursor: pointer;
+            color: $secondary-color;
+            border-radius: $border-radius;
+            transition: background-color 0.3s ease-in-out;
+            font-weight: 700;
+            &:hover {
+                background-color: darken($invalid-color, 20%);
+            }
+        }
+    }
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 999;
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+}
