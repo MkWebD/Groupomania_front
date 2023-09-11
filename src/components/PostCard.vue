@@ -256,7 +256,6 @@ const fileInputRefForUpdate = ref<HTMLInputElement[] | null>(null);
 const hasInputtedImageForCreation = ref<boolean>(false);
 const hasInputtedImageForUpdate = ref<boolean>(false);
 const posts = ref<PostObject[]>([]);
-const like = ref(0);
 const displayDeleteConfirmation = ref(false);
 const editedPostDataBeforeUpdate = ref({ title: "", content: "" });
 const postIdToDelete = ref<string | null>(null);
